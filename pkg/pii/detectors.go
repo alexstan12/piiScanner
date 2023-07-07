@@ -1,31 +1,26 @@
 package pii
 
 import (
+	"fmt"
 	"regexp"
-
-	cregex "github.com/mingrammer/commonregex"
 )
 
 const (
 	personColumnPattern = `(?i)(^.*(firstname|fname|lastname|lname|"
 	"fullname|maidenname|_name|"
 	"nickname|name_suffix|name|person).*)`
-	emailColumnPattern     = `(?i)(^.*(email|e-mail|mail).*)`
-	birthDateColumnPattern = `(?i)(^.*(date_of_birth|dateofbirth|dob|"
-	"birthday|date_of_death|dateofdeath|birthdate).*)`
+	emailColumnPattern       = `(?i)(^.*(email|e-mail|mail|mailid|mail-id|mail_id|identity).*)`
+	birthDateColumnPattern   = `(?i)(^.*(date_of_birth|dateofbirth|dob|birthday|date_of_death|dateofdeath|birthdate).*)`
 	genderColumnPattern      = `(?i)(^.*(gender).*)`
 	nationalityColumnPattern = `(?i)(^.*(nationality).*)`
 	addressColumnPattern     = `(?i)(^.*(address|city|state|county|country|zone|borough).*)`
 	zipCodeColumnPattern     = `(?i)(^.*(zipcode|zip_code|postal|postal_code|zip).*)`
 	userNameColumnPattern    = `(?i)(^.*user(id|name|).*)`
 	passwordColumnPattern    = `(?i)(^.*pass.*)`
-	ssnColumnPattern         = `(?i)(^.*(ssn|social_number|social_security|"
-	"social_security_number|social_security_no).*)`
-	poBoxColumnPattern      = `(?i)(^.*(po_box|pobox).*)`
-	creditCardColumnPattern = `(?i)(^.*(credit_card|cc_number|cc_num|creditcard|"
-	"credit_card_num|creditcardnumber).*)`
-	phoneColumnPattern = `(?i)(^.*(phone|phone_number|phone_no|phone_num|"
-	"telephone|telephone_num|telephone_no).*)`
+	ssnColumnPattern         = `(?i)(^.*(ssn|social_number|social_security|social_security_number|social_security_no).*)`
+	poBoxColumnPattern       = `(?i)(^.*(po_box|pobox).*)`
+	creditCardColumnPattern  = `(?i)(^.*(credit_card|cc_number|cc_num|creditcard|credit_card_num|creditcardnumber).*)`
+	phoneColumnPattern       = `(?i)(^.*(phone|phone_number|phone_no|phone_num|telephone|telephone_num|telephone_no).*)`
 )
 
 var (
@@ -45,15 +40,14 @@ var (
 )
 
 type Detector interface {
-	Detect(columnName string) PiiType
+	Detect(columnName string) bool
 }
 
 type DatumRegexDetector struct{}
 
 type ColumnNameRegexDetector struct{}
 
-func (c *ColumnNameRegexDetector) Detect(columnName string) string {
-	// TODO:
+func (c *ColumnNameRegexDetector) Detect(columnName string) bool {
 	var columnRegexp map[string]*regexp.Regexp = map[string]*regexp.Regexp{
 		"person":      personRegexp,
 		"email":       emailRegexp,
@@ -70,17 +64,18 @@ func (c *ColumnNameRegexDetector) Detect(columnName string) string {
 		"phone":       phoneRegexp,
 	}
 
-	for pii_type, ex := range columnRegexp {
+	for _, ex := range columnRegexp {
 		if ex.MatchString(columnName) {
-			return pii_type
+			return true
 		}
 	}
 
-	return ""
+	return false
 }
 
-func (d *DatumRegexDetector) Detect(columnData string) PiiType {
+func (d *DatumRegexDetector) Detect(columnData string) bool {
 	// TODO:
-	_ = cregex.BtcAddressRegex
-	return &Phone{}
+	// _ = commonregex.BtcAddressRegex
+	fmt.Println("NotImplemented")
+	return false
 }
